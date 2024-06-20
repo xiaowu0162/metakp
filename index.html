@@ -600,11 +600,11 @@
               </h2>
                 <center>
                     <p>
-                    We introduce <b><span class="dnerf">SynCheck</span></b>, an efficient synchronous checker for faithful retrieval-augmented langauge models (RALMs). We further introduce <b><span class="dnerf">FOD</span></b>, a faithfulness-oriented decoding mechanism that guides RALM decoding on-the-fly. 
+                    We introduce <b>on-demand keyphrase generation</b>, a novel paradigm that requires keyphrase predictions to conform to specific high-level goals or intents. We release <b><span class="dnerf">MetaKP</span></b>, a large-scale benchmarking dataset covering four datasets, 7500 documents, and 3760 goals from the news and biomedical text domain. 
                     </p>
                 </center>
             <br>
-            <img src="src/figure_1.png" class="center">
+            <img src="src/figure_1.png" class="center", style="width: 70%; display: block; margin: auto;">
                 
         </div>
       </div>
@@ -615,53 +615,88 @@
 <section class="section">
     <div class="container is-max-desktop">
           <h2 class="subtitle is-size-3-tablet has-text-weight-bold has-text-centered has-background-info-light mr-0 pt-3 pb-3">
-        Synchronous Faithfulness Monitoring
+        Benchmark Construction
            </h2>
           <div class="content has-text-justified">
             <p>
-                Retrieval-augmented language models (RALMs) have shown strong performance and wide applicability in knowledge-intensive tasks. However, there are significant trustworthiness concerns as RALMs are prone to generating unfaithful outputs, including baseless information or contradictions with the retrieved context. 
+                We build a scalable labeling pipeline that combines GPT-4 and human annotators to construct high-quality goals from keyphrases. 
             </p>
+            <img src="src/figure_2.png" class="center">
             <p>
-                Existing <em>post-hoc</em> approaches solve faithfulness issues via citation or revision, yet they are computationally costly. Meanwhile, existing <em>on-the-fly</em> interventions adopted by RALM systems are accuracy-driven, while their efficacy in detecting and correcting faithfulness errors is unknown. In this work, we ask: 
-                <center><b><em>Can we build efficient and accuracy faithfulness checkers for RALMs?</em></b></center>
+                We run the pipeline on KPTimes, DUC2001, KPBiomed, and Pubmed to collect a diverse dataset covering two domains, 7500 documents, and 3760 goals.
             </p>
-            <p>We build <b><span class="dnerf">SynCheck</span></b>, an accurate checker for faithfulness errors that ensembles a range of efficiently measurable decoding dynamics. On a suite of six long-form retrieval-augmented generation datasets, <b><span class="dnerf">SynCheck</span></b> achieves 0.85 AUROC in detecting faithfulness errors across six long-form retrieval-augmented generation tasks, improving prior best method by 4%.</p>
-            <img src="src/table_1.png" class="center">
-            <p>
-                Although <b><span class="dnerf">SynCheck</span></b> requires training a lightweight aggregator, we find that the training processs does not need to be task-specific. 
-            </p>
-            <img src="src/figure_4.png" class="center", style="width: 60%; display: block; margin: auto;">
-            <p>
-                In addition, we can train <b><span class="dnerf">SynCheck</span></b> on a surrogate model, which can be leveraged to detect faitfhulness errors in other models' outputs.  
-            </p>
-            <img src="src/table_3.png" class="center", style="width: 60%; display: block; margin: auto;">
+            <img src="src/table_1.png" class="center", style="width: 60%; display: block; margin: auto;">
+            <img src="src/figure_3.png" class="center", style="width: 90%; display: block; margin: auto;">
+
           </div>
     </div>
       <!--/ Abstract. -->
     </section>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-              <h2 class="subtitle is-size-3-tablet has-text-weight-bold has-text-centered has-background-info-light mr-0 pt-3 pb-3">
-            Synchronous Faithfulness Intervention
-               </h2>
-              <div class="content has-text-justified">
-                <p>
-                    We further introduce <b><span class="dnerf">FOD</span></b>, a faithfulness-oriented decoding algorithm that levereages <b><span class="dnerf">SynCheck</span></b>'s on-the-fly feedback with a beam search algorithm.
-                </p>
-                <img src="src/algorithm_1.png" class="center" class="center", style="width: 60%; display: block; margin: auto;">
-                <p>
-                    On a suite of six datasets, we find <b><span class="dnerf">FOD</span></b> significantly improves over a range of baseline decoding strategies in improving the faithfulness of the output. 
-                </p>
-                <img src="src/table_2.png" class="center">
-                <p>
-                    In addition, compared to CAD, the prior state-of-the-art faithful decoding method, <b><span class="dnerf">FOD</span></b> achieves a better faithfulness at the first L sentences, with L=1, ..., 10.
-                </p>
-                <img src="src/figure_2.png" class="center">
-              </div>
-        </div>
-          <!--/ Abstract. -->
-        </section>
+
+
+<section class="section">
+    <div class="container is-max-desktop">
+          <h2 class="subtitle is-size-3-tablet has-text-weight-bold has-text-centered has-background-info-light mr-0 pt-3 pb-3">
+        Modeling
+           </h2>
+          <div class="content has-text-justified">
+            <p>
+                We develop both unsupervised and supervised methods to perform on-demand keyphrase generation. 
+            </p>
+            <p> For the unsupervised approach, we design a <em>self-consistency prompting</em> approach that leverages the frequency and rank information from the samples collected from large language models (LLMs). Concretely, we collect K samples, each of which consists of a sequence of keyphrases. Then, each phrase is scored using the following formula.
+            </p>
+            <img src="src/formula.png" class="center", style="width: 65%; display: block; margin: auto;">
+            <p>
+                For the supervised method, we design a <em>multi-task learning</em> approach to fine-tune a sequence-to-sequence pre-trained language model to self-determine the relevance of a goal and selectively generate keyphrases.
+            </p>
+            <img src="src/figure_4.png" class="center", style="width: 70%; display: block; margin: auto;">
+
+          </div>
+    </div>
+      <!--/ Abstract. -->
+    </section>
+
+
+
+<section class="section">
+    <div class="container is-max-desktop">
+          <h2 class="subtitle is-size-3-tablet has-text-weight-bold has-text-centered has-background-info-light mr-0 pt-3 pb-3">
+        Results
+           </h2>
+          <div class="content has-text-justified">
+            <p> Our experiments reveal the following insight:
+                <li>
+                    <b><span class="dnerf">MetaKP</span></b>  represents a challenging benchmark for keyphrase generation. Flan-T5-XL, the strongest fine-tuned model, only achieves an average of 0.609 Satisfaction Rate across all the datasets, and zero-shot prompting GPT-4o, a strong LLM, only achieves 0.492 SR. 
+                </li>
+                <li>The proposed self-consistency prompting approach greatly improves the performance of LLMs, enabling GPT-4o to achieve 0.548 SemF1, surpassing the performance of a fully fine-tuned BART-base model. </li>
+                <li>Supervised fine-tuning can fail to generalize on out-of-distribution testing data. By contrast, LLM-based unsupervised method achieves consistent performance in all the domains, especially in the news domain, where GPT-4o outperforms supervised Flan-T5-XL by 19\% in out-of-distribution testing. </li>
+            </p>
+            <img src="src/table_2.png" class="center">
+            <p>We provide more analyses on both methods as well as qualitative examples in the paper.</p>
+          </div>
+    </div>
+      <!--/ Abstract. -->
+    </section>
+
+
+
+<section class="section">
+    <div class="container is-max-desktop">
+            <h2 class="subtitle is-size-3-tablet has-text-weight-bold has-text-centered has-background-info-light mr-0 pt-3 pb-3">
+        Application
+            </h2>
+            <div class="content has-text-justified">
+            
+            <p> Finally, we demonstrate the potential of on-demand keyphrase generation as a <b>general NLP infrastructure</b>. Specifically, we use event detection for <em>epidemics prediction</em> as a test bed. By constructing simple goals from event ontology and attempting to extract relevant keyphrases from social media text, we show that an on-demand keyphrase generation model has the potential to extract epidemic-related trends similar to an event detection model trained on task-specific data.
+            </p>
+            <img src="src/figure_7.png" class="center", style="width: 70%; display: block; margin: auto;">
+
+            </div>
+    </div>
+        <!--/ Abstract. -->
+    </section>
+
 
 <section class="section" id="BibTeX">
     <div class="container is-max-desktop" content> 
